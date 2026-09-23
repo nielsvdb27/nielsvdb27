@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trainingsschema — 6-daags</title>
+<style>
+  :root{
+    --bg:#161513;
+    --bg-elev:#1f1e1b;
+    --bg-elev-2:#2a2926;
+    --line:#38362f;
+    --text:#efeae1;
+    --text-dim:#a39c8c;
+    --accent:#e2531f;
+    --accent-dim:#7a3013;
+    --good:#7ba35a;
+    --font-display:'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --font-body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f3f1ec;
+      --bg-elev:#ffffff;
+      --bg-elev-2:#eae6dc;
+      --line:#d9d3c4;
+      --text:#201e1a;
+      --text-dim:#726b5c;
+      --accent:#c74317;
+      --accent-dim:#f0c9b9;
+      --good:#4f7a34;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f3f1ec;
+    --bg-elev:#ffffff;
+    --bg-elev-2:#eae6dc;
+    --line:#d9d3c4;
+    --text:#201e1a;
+    --text-dim:#726b5c;
+    --accent:#c74317;
+    --accent-dim:#f0c9b9;
+    --good:#4f7a34;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));
+  }
+  a{color:inherit;}
+
+  header{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+    padding:calc(14px + env(safe-area-inset-top,0px)) 18px 12px;
+  }
+  .titlebar{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(26px,7vw,34px);
+    letter-spacing:.3px;
+    margin:0;
+    line-height:1;
+  }
+  .theme-toggle{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    border-radius:8px;
+    width:34px;
+    height:34px;
+    font-size:16px;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .datebar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:12px;
+  }
+  .datebar button.nav{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:8px;
+    width:36px;
+    height:36px;
+    font-size:16px;
+    cursor:pointer;
+  }
+  .datebar input[type=date]{
+    flex:1;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-family:var(--font-body);
+    font-size:15px;
+  }
+  .today-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:0 14px;
+    height:36px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:18px 18px 0;
+  }
+
+  .day-hero{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:4px;
+  }
+  .day-hero .day-name{
+    font-family:var(--font-display);
+    font-size:22px;
+    font-weight:600;
+  }
+  .day-hero .day-focus{
+    color:var(--accent);
+    font-size:14px;
+    font-weight:600;
+  }
+  .streak{
+    color:var(--text-dim);
+    font-size:13px;
+    margin-bottom:18px;
+  }
+
+  .week-strip{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    margin-bottom:20px;
+  }
+  .week-strip .cell{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--bg-elev);
+    padding:7px 2px;
+    text-align:center;
+    cursor:pointer;
+  }
+  .week-strip .cell.active{
+    border-color:var(--accent);
+    background:var(--accent-dim);
+  }
+  .week-strip .cell .l{
+    display:block;
+    font-size:11px;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+  .week-strip .cell.active .l{color:var(--text);}
+  .week-strip .cell .dot{
+    width:6px;height:6px;border-radius:50%;
+    margin:0 auto;
+    background:var(--line);
+  }
+  .week-strip .cell.done .dot{background:var(--good);}
+
+  .rest-card{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:28px 20px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:15px;
+    line-height:1.5;
+  }
+  .rest-card .big{
+    font-family:var(--font-display);
+    font-size:24px;
+    color:var(--text);
+    display:block;
+    margin-bottom:6px;
+  }
+
+  .exercise{
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px 16px;
+    margin-bottom:12px;
+  }
+  .exercise-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .exercise-head .name{
+    font-weight:600;
+    font-size:16px;
+  }
+  .exercise-head .muscle{
+    font-size:11px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:.4px;
+  }
+  .exercise .prev-line{
+    font-size:12px;
+    color:var(--text-dim);
+    margin:-4px 0 10px;
+  }
+  .exercise .prev-line b{color:var(--text);font-weight:600;}
+  .set-row{
+    display:grid;
+    grid-template-columns:26px 1fr 1fr 30px;
+    gap:8px;
+    align-items:center;
+    margin-bottom:6px;
+  }
+  .set-row .idx{
+    color:var(--text-dim);
+    font-size:13px;
+    text-align:center;
+  }
+  .set-row input[type=number]{
+    width:100%;
+    background:var(--bg-elev-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 8px;
+    color:var(--text);
+    font-size:15px;
+    font-family:var(--font-body);
+  }
+  .set-row input[type=number]::-webkit-outer-spin-button,
+  .set-row input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none;margin:0;
+  }
+  .set-row .check{
+    width:26px;height:26px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:var(--bg-elev-2);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    font-size:14px;
+    color:transparent;
+  }
+  .set-row .check.on{
+    background:var(--good);
+    border-color:var(--good);
+    color:#fff;
+  }
+  .col-labels{
+    display:grid;
+    grid-template-columns:26px 1fr 1fr 30px;
+    gap:8px;
+    margin-bottom:6px;
+    font-size:11px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+  .col-labels .idx{text-align:center;}
+  .set-actions{
+    display:flex;
+    gap:10px;
+    margin-top:8px;
+  }
+  .set-actions button{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:13px;
+    cursor:pointer;
+    padding:2px 0;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .cardio-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .cardio-row input[type=text]{
+    flex:1;
+    background:var(--bg-elev-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 10px;
+    color:var(--text);
+    font-size:14px;
+    font-family:var(--font-body);
+  }
+  .cardio-row .check{
+    width:30px;height:30px;flex-shrink:0;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--bg-elev-2);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:transparent;
+  }
+  .cardio-row .check.on{background:var(--good);border-color:var(--good);color:#fff;}
+
+  .notes-field{
+    margin-top:16px;
+  }
+  .notes-field label{
+    display:block;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+  .notes-field textarea{
+    width:100%;
+    min-height:60px;
+    background:var(--bg-elev);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:14px;
+    resize:vertical;
+  }
+
+  .save-bar{
+    position:sticky;
+    bottom:0;
+    background:var(--bg);
+    border-top:1px solid var(--line);
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));
+    margin-top:22px;
+  }
+  .save-btn{
+    width:100%;
+    max-width:640px;
+    margin:0 auto;
+    display:block;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:14px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:var(--font-display);
+    letter-spacing:.3px;
+  }
+  .toast{
+    position:fixed;
+    bottom:calc(84px + env(safe-area-inset-bottom,0px));
+    left:50%;
+    transform:translateX(-50%) translateY(10px);
+    background:var(--text);
+    color:var(--bg);
+    padding:9px 16px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s, transform .2s;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  footer.legend{
+    max-width:640px;
+    margin:22px auto 0;
+    padding:0 18px 4px;
+    font-size:12px;
+    color:var(--text-dim);
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="titlebar">
+    <h1>Schema</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Thema wisselen">◐</button>
+  </div>
+  <div class="datebar">
+    <button class="nav" id="prevDay" aria-label="Vorige dag">‹</button>
+    <input type="date" id="dateInput">
+    <button class="nav" id="nextDay" aria-label="Volgende dag">›</button>
+    <button class="today-btn" id="todayBtn">Vandaag</button>
+  </div>
+</header>
+
+<main>
+  <div class="week-strip" id="weekStrip"></div>
+  <div class="day-hero">
+    <span class="day-name" id="dayName">—</span>
+    <span class="day-focus" id="dayFocus">—</span>
+  </div>
+  <div class="streak" id="streakLine"></div>
+  <div id="exerciseList"></div>
+  <div class="notes-field">
+    <label for="notesArea">Notities bij deze training</label>
+    <textarea id="notesArea" placeholder="Hoe voelde het, wat viel op, waar pijn/vermoeidheid?"></textarea>
+  </div>
+</main>
+
+<div class="save-bar">
+  <button class="save-btn" id="saveBtn">Training opslaan</button>
+</div>
+<div class="toast" id="toast">Opgeslagen</div>
+
+<footer class="legend">Alles wordt lokaal op dit toestel/in deze browser bewaard. Open deze link elke dag opnieuw om bij te houden — voeg hem toe aan je beginscherm voor snelle toegang.</footer>
+
+<script>
+(function(){
+  // ---------- Program definition ----------
+  const chestExercises = () => ([
+    ex('flat_bench','Flat bench press','Borst',4),
+    ex('incline_press','Incline chest press','Borst',3),
+    ex('flys','Flys','Borst',3),
+    ex('shoulder_fly','Shoulder fly','Schouders',3),
+    ex('ohp','Overhead press (schouders)','Schouders',3),
+    ex('tricep_ext','Triceps extension','Triceps',3),
+  ]);
+  const backExercises = () => ([
+    ex('lat_wide','Lat pulldown — breed','Rug',4),
+    ex('lat_narrow','Lat pulldown — smal','Rug',3),
+    ex('pullups','Optrekken (pull-ups)','Rug',3),
+    ex('bicep_bar','Bicep curl met stang','Biceps',3),
+    ex('hammer_curl','Bicep hammer curl','Biceps',3),
+  ]);
+  const legExercises = () => ([
+    ex('bulgarian','Bulgarian split squat','Benen',3),
+    ex('squat_belt','Squat (belt)','Benen',4),
+    ex('leg_ext','Leg extension','Quads',3),
+    ex('calves','Kuiten','Kuiten',4),
+  ]);
+  function ex(id,name,muscle,sets){ return {id,name,muscle,sets}; }
+
+  const WEEK = {
+    1:{label:'Maandag',   focus:'Borst & Schouders', type:'strength', exercises:chestExercises()},
+    2:{label:'Dinsdag',   focus:'Rug & Biceps',       type:'strength', exercises:backExercises()},
+    3:{label:'Woensdag',  focus:'Interval hardlopen & stretchen', type:'cardio',
+       exercises:[
+         {id:'intervals', name:'Interval hardlopen', kind:'cardio',
+           defaultDetail:'10 min opwarmen joggen — 10x sprint 30 sec (rust 90 sec) — uitlopen'},
+         {id:'stretch', name:'Stretchen / mobiliteit', kind:'cardio'},
+       ]},
+    4:{label:'Donderdag', focus:'Benen',              type:'strength', exercises:legExercises()},
+    5:{label:'Vrijdag',   focus:'Rug & Biceps',       type:'strength', exercises:backExercises()},
+    6:{label:'Zaterdag',  focus:'Borst & Schouders',  type:'strength', exercises:chestExercises()},
+    0:{label:'Zondag',    focus:'Rust', type:'rest', exercises:[]},
+  };
+  const DOW_SHORT = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+
+  // ---------- State ----------
+  let currentDate = new Date();
+  const dateInput = document.getElementById('dateInput');
+  const themeToggle = document.getElementById('themeToggle');
+
+  function fmt(d){
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function parseLocal(str){
+    const [y,m,d] = str.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  function logKey(d){ return 'workout-log:'+fmt(d); }
+
+  function loadLog(d){
+    try{
+      const raw = localStorage.getItem(logKey(d));
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveLog(d, data){
+    try{
+      localStorage.setItem(logKey(d), JSON.stringify(data));
+      return true;
+    }catch(e){ return false; }
+  }
+  function getPreviousSets(exId, beforeDateStr){
+    let best = null, bestKey = '';
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key || !key.startsWith('workout-log:')) continue;
+      const dateStr = key.slice('workout-log:'.length);
+      if(dateStr >= beforeDateStr) continue;
+      if(dateStr <= bestKey) continue;
+      try{
+        const log = JSON.parse(localStorage.getItem(key));
+        const sets = log && log.sets && log.sets[exId];
+        if(sets && sets.some(s=>s && s.weight!=='' && s.weight!=null)){
+          best = {date: dateStr, sets};
+          bestKey = dateStr;
+        }
+      }catch(e){}
+    }
+    return best;
+  }
+
+  function hasAnyDone(log){
+    if(!log) return false;
+    if(log.cardio){
+      return Object.values(log.cardio).some(v=>v && v.done);
+    }
+    if(log.sets){
+      return Object.values(log.sets).some(exSets => exSets.some(s=>s && s.done));
+    }
+    return false;
+  }
+
+  // ---------- Theme ----------
+  const savedTheme = localStorage.getItem('tracker-theme');
+  if(savedTheme){ document.documentElement.setAttribute('data-theme', savedTheme); }
+  themeToggle.addEventListener('click', ()=>{
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : (cur === 'light' ? 'dark' : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light':'dark'));
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('tracker-theme', next); }catch(e){}
+  });
+
+  // ---------- Render ----------
+  const dayNameEl = document.getElementById('dayName');
+  const dayFocusEl = document.getElementById('dayFocus');
+  const streakLineEl = document.getElementById('streakLine');
+  const listEl = document.getElementById('exerciseList');
+  const notesArea = document.getElementById('notesArea');
+  const weekStripEl = document.getElementById('weekStrip');
+  const toastEl = document.getElementById('toast');
+
+  let currentLog = {};
+
+  function render(){
+    const dow = currentDate.getDay();
+    const day = WEEK[dow];
+    dateInput.value = fmt(currentDate);
+    dayNameEl.textContent = day.label + ' · ' + currentDate.toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
+    dayFocusEl.textContent = day.focus;
+
+    currentLog = loadLog(currentDate);
+    notesArea.value = currentLog.notes || '';
+
+    renderWeekStrip(dow);
+    renderStreak();
+
+    listEl.innerHTML = '';
+    if(day.type === 'rest'){
+      listEl.innerHTML = `<div class="rest-card"><span class="big">Rustdag</span>Herstel is waar de groei gebeurt. Geen training vandaag — eiwit binnenkrijgen, slapen, morgen weer scherp.</div>`;
+      return;
+    }
+    if(day.type === 'cardio'){
+      day.exercises.forEach(item=>{
+        const wrap = document.createElement('div');
+        wrap.className = 'exercise';
+        const hasSaved = currentLog.cardio && currentLog.cardio[item.id];
+        const state = hasSaved || {done:false, detail:item.defaultDetail || ''};
+        wrap.innerHTML = `
+          <div class="exercise-head"><span class="name">${item.name}</span></div>
+          <div class="cardio-row">
+            <input type="text" placeholder="bv. 6x 400m, 90 sec rust — of duur/afstand" data-cardio="${item.id}" value="${escapeAttr(state.detail||'')}">
+            <div class="check ${state.done?'on':''}" data-cardio-check="${item.id}">✓</div>
+          </div>
+        `;
+        listEl.appendChild(wrap);
+        if(!hasSaved){
+          if(!currentLog.cardio) currentLog.cardio = {};
+          currentLog.cardio[item.id] = {done:false, detail:item.defaultDetail||''};
+        }
+      });
+      attachCardioHandlers();
+      return;
+    }
+
+    // strength day
+    day.exercises.forEach(item=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'exercise';
+      const existingSets = (currentLog.sets && currentLog.sets[item.id]) || defaultSets(item.sets);
+      const prev = getPreviousSets(item.id, fmt(currentDate));
+      const prevLineHtml = prev
+        ? `<div class="prev-line">Vorige keer (${prev.date.split('-').reverse().slice(0,2).join('-')}): <b>${prev.sets.filter(s=>s.weight!=='').map(s=>`${s.weight}kg×${s.reps||'?'}`).join(', ')}</b></div>`
+        : `<div class="prev-line">Nog geen eerdere data voor deze oefening</div>`;
+      wrap.innerHTML = `
+        <div class="exercise-head">
+          <span class="name">${item.name}</span>
+          <span class="muscle">${item.muscle}</span>
+        </div>
+        ${prevLineHtml}
+        <div class="col-labels"><span class="idx">#</span><span>kg</span><span>reps</span><span></span></div>
+        <div class="sets-container" data-ex="${item.id}"></div>
+        <div class="set-actions">
+          <button data-add="${item.id}">+ set toevoegen</button>
+          <button data-remove="${item.id}">− laatste set</button>
+        </div>
+      `;
+      listEl.appendChild(wrap);
+      renderSets(wrap.querySelector('.sets-container'), item.id, existingSets, prev ? prev.sets : null);
+    });
+  }
+
+  function defaultSets(n){
+    return Array.from({length:n}, ()=>({weight:'', reps:'', done:false}));
+  }
+
+  function renderSets(container, exId, sets, prevSets){
+    container.innerHTML = '';
+    sets.forEach((s, i)=>{
+      const p = prevSets ? (prevSets[i] || prevSets[prevSets.length-1]) : null;
+      const wPlaceholder = p && p.weight!=='' ? p.weight : '0';
+      const rPlaceholder = p && p.reps!=='' ? p.reps : '0';
+      const row = document.createElement('div');
+      row.className = 'set-row';
+      row.innerHTML = `
+        <span class="idx">${i+1}</span>
+        <input type="number" inputmode="decimal" placeholder="${wPlaceholder}" data-w="${exId}" data-i="${i}" value="${s.weight!==undefined?s.weight:''}">
+        <input type="number" inputmode="numeric" placeholder="${rPlaceholder}" data-r="${exId}" data-i="${i}" value="${s.reps!==undefined?s.reps:''}">
+        <div class="check ${s.done?'on':''}" data-c="${exId}" data-i="${i}">✓</div>
+      `;
+      container.appendChild(row);
+    });
+    if(!currentLog.sets) currentLog.sets = {};
+    currentLog.sets[exId] = sets;
+    attachSetHandlers();
+  }
+
+  function attachSetHandlers(){
+    listEl.querySelectorAll('[data-w]').forEach(inp=>{
+      inp.oninput = ()=>{
+        const exId = inp.dataset.w, i = +inp.dataset.i;
+        currentLog.sets[exId][i].weight = inp.value;
+      };
+    });
+    listEl.querySelectorAll('[data-r]').forEach(inp=>{
+      inp.oninput = ()=>{
+        const exId = inp.dataset.r, i = +inp.dataset.i;
+        currentLog.sets[exId][i].reps = inp.value;
+      };
+    });
+    listEl.querySelectorAll('[data-c]').forEach(chk=>{
+      chk.onclick = ()=>{
+        const exId = chk.dataset.c, i = +chk.dataset.i;
+        currentLog.sets[exId][i].done = !currentLog.sets[exId][i].done;
+        chk.classList.toggle('on', currentLog.sets[exId][i].done);
+      };
+    });
+    listEl.querySelectorAll('[data-add]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const exId = btn.dataset.add;
+        currentLog.sets[exId].push({weight:'',reps:'',done:false});
+        const prev = getPreviousSets(exId, fmt(currentDate));
+        renderSets(listEl.querySelector(`.sets-container[data-ex="${exId}"]`), exId, currentLog.sets[exId], prev ? prev.sets : null);
+      };
+    });
+    listEl.querySelectorAll('[data-remove]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const exId = btn.dataset.remove;
+        if(currentLog.sets[exId].length > 1){
+          currentLog.sets[exId].pop();
+          const prev = getPreviousSets(exId, fmt(currentDate));
+          renderSets(listEl.querySelector(`.sets-container[data-ex="${exId}"]`), exId, currentLog.sets[exId], prev ? prev.sets : null);
+        }
+      };
+    });
+  }
+
+  function attachCardioHandlers(){
+    listEl.querySelectorAll('[data-cardio]').forEach(inp=>{
+      inp.oninput = ()=>{
+        if(!currentLog.cardio) currentLog.cardio = {};
+        const id = inp.dataset.cardio;
+        if(!currentLog.cardio[id]) currentLog.cardio[id] = {done:false, detail:''};
+        currentLog.cardio[id].detail = inp.value;
+      };
+    });
+    listEl.querySelectorAll('[data-cardio-check]').forEach(chk=>{
+      chk.onclick = ()=>{
+        if(!currentLog.cardio) currentLog.cardio = {};
+        const id = chk.dataset.cardioCheck;
+        if(!currentLog.cardio[id]) currentLog.cardio[id] = {done:false, detail:''};
+        currentLog.cardio[id].done = !currentLog.cardio[id].done;
+        chk.classList.toggle('on', currentLog.cardio[id].done);
+      };
+    });
+  }
+
+  function escapeAttr(s){
+    return String(s).replace(/"/g,'&quot;');
+  }
+
+  function renderWeekStrip(activeDow){
+    weekStripEl.innerHTML = '';
+    // Monday-first display
+    const order = [1,2,3,4,5,6,0];
+    const base = new Date(currentDate);
+    const diffToMonday = (base.getDay()+6)%7;
+    const monday = new Date(base);
+    monday.setDate(base.getDate() - diffToMonday);
+
+    order.forEach((dow, idx)=>{
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + idx);
+      const log = loadLog(d);
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (dow===activeDow && fmt(d)===fmt(currentDate) ? ' active':'') + (hasAnyDone(log) ? ' done':'');
+      cell.innerHTML = `<span class="l">${DOW_SHORT[dow]}</span><span class="dot"></span>`;
+      cell.onclick = ()=>{ currentDate = d; render(); };
+      weekStripEl.appendChild(cell);
+    });
+  }
+
+  function renderStreak(){
+    let streak = 0;
+    let d = new Date(currentDate);
+    while(true){
+      const log = loadLog(d);
+      const dow = d.getDay();
+      if(WEEK[dow].type === 'rest'){ d.setDate(d.getDate()-1); continue; }
+      if(hasAnyDone(log)){ streak++; d.setDate(d.getDate()-1); }
+      else break;
+    }
+    streakLineEl.textContent = streak > 0 ? `${streak} trainingsdag${streak===1?'':'en'} op rij afgevinkt` : 'Nog geen sets afgevinkt voor deze reeks';
+  }
+
+  // ---------- Save ----------
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    currentLog.notes = notesArea.value;
+    currentLog.savedAt = new Date().toISOString();
+    const ok = saveLog(currentDate, currentLog);
+    showToast(ok ? 'Opgeslagen' : 'Opslaan mislukt — probeer opnieuw');
+    renderWeekStrip(currentDate.getDay());
+    renderStreak();
+  });
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=>toastEl.classList.remove('show'), 1600);
+  }
+
+  // ---------- Date navigation ----------
+  dateInput.addEventListener('change', ()=>{
+    if(dateInput.value){ currentDate = parseLocal(dateInput.value); render(); }
+  });
+  document.getElementById('prevDay').addEventListener('click', ()=>{
+    currentDate.setDate(currentDate.getDate()-1); render();
+  });
+  document.getElementById('nextDay').addEventListener('click', ()=>{
+    currentDate.setDate(currentDate.getDate()+1); render();
+  });
+  document.getElementById('todayBtn').addEventListener('click', ()=>{
+    currentDate = new Date(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
